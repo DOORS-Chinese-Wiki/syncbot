@@ -75,4 +75,7 @@ python -m venv .venv
 
 ## 许可
 
-同步自 DOORS Wiki 的内容遵循 CC BY-SA 4.0。
+本仓库采用 **CC BY-SA 4.0**（署名-相同方式共享 4.0 国际），详见 [LICENSE](LICENSE)。
+
+从 DOORS Wiki 同步的模板、模块与文本内容同样遵循 CC BY-SA 4.0，
+版权归原作者与贡献者所有。从游戏文件中提取的资源不在本仓库内。
