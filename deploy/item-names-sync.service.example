@@ -1,0 +1,17 @@
+[Unit]
+Description=DOORS 中文维基物品译名同步
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/doors-wiki
+EnvironmentFile=/etc/doors-wiki/tencent_docs.env
+ExecStart=/opt/doors-wiki/.venv/bin/python -u /opt/doors-wiki/scripts/item_names_sync.py sync --apply --backend grist
+StandardOutput=append:/var/log/item-names-sync.log
+StandardError=append:/var/log/item-names-sync.log
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

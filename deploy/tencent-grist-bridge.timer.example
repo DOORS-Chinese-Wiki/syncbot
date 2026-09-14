@@ -1,0 +1,10 @@
+[Unit]
+Description=定时触发腾讯文档 → Grist 同步
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=30min
+Unit=tencent-grist-bridge.service
+
+[Install]
+WantedBy=timers.target

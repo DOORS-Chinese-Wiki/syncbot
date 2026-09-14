@@ -1,0 +1,26 @@
+services:
+  grist:
+    image: gristlabs/grist:latest
+    container_name: grist
+    restart: unless-stopped
+    # 只监听本机，由宿主机的 Nginx 反代出去
+    ports:
+      - "127.0.0.1:8484:8484"
+    volumes:
+      - ./data:/persist
+    environment:
+      # 反代后的对外地址，必须与实际访问地址一致，否则登录会跳错
+      APP_HOME_URL: ${APP_HOME_URL}
+      # 单组织模式，个人/小团队自建最简单
+      GRIST_SINGLE_ORG: ${GRIST_SINGLE_ORG}
+      # 会话签名密钥，务必随机且保密
+      GRIST_SESSION_SECRET: ${GRIST_SESSION_SECRET}
+      # 首个管理员邮箱（首次打开页面时用它注册）
+      GRIST_DEFAULT_EMAIL: ${GRIST_DEFAULT_EMAIL}
+      TZ: ${TZ:-Asia/Shanghai}
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8484/status').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s

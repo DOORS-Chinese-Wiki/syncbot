@@ -1,0 +1,19 @@
+[Unit]
+Description=DOORS 中文维基成就文本双向同步
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/doors-wiki
+EnvironmentFile=/etc/doors-wiki/tencent_docs.env
+ExecStart=/opt/doors-wiki/.venv/bin/python -u /opt/doors-wiki/scripts/achievements_sync.py watch --interval 30 --apply --backend grist
+Restart=always
+RestartSec=30
+StandardOutput=append:/var/log/achievements-sync.log
+StandardError=append:/var/log/achievements-sync.log
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,14 @@
+[Unit]
+Description=腾讯文档 → Grist 物品/成就同步（腾讯为主）
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/doors-wiki
+EnvironmentFile=-/etc/doors-wiki/tencent_docs.env
+ExecStart=/opt/doors-wiki/.venv/bin/python -u /opt/doors-wiki/scripts/tencent_grist_bridge.py --apply
+StandardOutput=append:/var/log/tencent-grist-bridge.log
+StandardError=append:/var/log/tencent-grist-bridge.log
+NoNewPrivileges=true
+PrivateTmp=true

@@ -1,0 +1,10 @@
+[Unit]
+Description=定时触发物品译名同步
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+Unit=item-names-sync.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,41 @@
+# ===== 凭据与密钥（绝对不要提交）=====
+.env
+grist.env
+tencent_docs.env
+user-config.py
+user-password.py
+pywikibot-*.lwp
+*.lwp
+*.secret
+
+# ===== 运行期缓存 / 日志 / 锁 =====
+apicache/
+pwb-home/
+__pycache__/
+*.pyc
+throttle.ctrl
+*.log
+
+# ===== 数据快照与中间产物 =====
+data/
+outputs/
+*.xlsx
+*.csv
+_sync_*/
+_archive_2026-09/
+.tmp_*/
+.agent-teams/
+
+# ===== 抓取到的原站内容与译文 =====
+pages_src/
+pages_zh/
+templates_src/
+templates_zh/
+images/
+_policies_dump.txt
+policies_en.txt
+staff_current.txt
+
+# ===== 本地运行时 =====
+Python/
+deploy/grist/data/
