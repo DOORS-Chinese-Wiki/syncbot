@@ -39,3 +39,10 @@ staff_current.txt
 # ===== 本地运行时 =====
 Python/
 deploy/grist/data/
+
+# ===== 属于 wiki 而非本工具的文档（留在本地，不要提交）=====
+FLOORS_TRANSLATION_GUIDE.md
+TEMPLATE_TRANSLATION_GUIDE.md
+被引用页面与翻译情况.md
+MediaWiki 中文 Wiki 跨语言页面按钮开发计划.md
+DOORS 音乐专辑 Vol. 1–6 曲目整理.md
