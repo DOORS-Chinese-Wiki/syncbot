@@ -153,6 +153,99 @@ def push(execute: bool, force: bool = False, only: str | None = None) -> int:
     return 0
 
 
+# 旧 Project: 命名空间 / 中文别名 -> 新页面的重定向。
+# MediaWiki 的 aboutpage / disclaimerpage / copyrightpage 等界面消息默认指向
+# {{ns:project}}:X；英文站的 {{ns:project}} 就是 DOORS Wiki，中文站叫 Project，
+# 因此这些链接会落到空页面，需要在这里补重定向。
+LEGACY_REDIRECTS = {
+    "Project:关于": "DOORS Wiki:About",
+    "Project:免责声明": "DOORS Wiki:General disclaimer",
+    "Project:著作权": "DOORS Wiki:Copyrights",
+    "Project:Contributors": "DOORS Wiki:Wiki Contributors",
+    "Project:方针": "DOORS Wiki:Policies",
+    "Project:规则": "DOORS Wiki:Rules",
+    "Project:格式手册": "DOORS Wiki:Manual of Style",
+    "Project:工作人员": "DOORS Wiki:Staff",
+    "Project:用户权限": "DOORS Wiki:User rights",
+    "Project:图片方针": "DOORS Wiki:Image policy",
+    "Project:版权方针": "DOORS Wiki:Copyright",
+    "Project:渲染图方针": "DOORS Wiki:Render policy",
+    "Project:AI 方针": "DOORS Wiki:AI policy",
+    "Project:收录标准": "DOORS Wiki:Notability",
+    "Project:贡献者": "DOORS Wiki:Wiki Contributors",
+    "Project:条目视频化": "DOORS Wiki:计划/条目视频化",
+}
+
+# 已存在但目标写错的重定向（改名过程中产生）
+REDIRECT_REPAIRS = {
+    "Rules": "DOORS Wiki:Rules",   # 目标误写成小写的 Doors Wiki:Rules
+}
+
+# 页脚链接的界面消息改指新页面（需要 interface-admin）
+MESSAGE_OVERRIDES = {
+    "MediaWiki:Aboutpage": "DOORS Wiki:About",
+    "MediaWiki:Disclaimerpage": "DOORS Wiki:General disclaimer",
+    "MediaWiki:Copyrightpage": "DOORS Wiki:Copyrights",
+}
+
+
+def sync_redirects(execute: bool) -> int:
+    zh = pywikibot.Site("zhdoors", "zhdoors")
+    created = existing = repaired = failed = 0
+    for source, target in sorted(LEGACY_REDIRECTS.items()):
+        page = pywikibot.Page(zh, source)
+        if page.exists():
+            existing += 1
+            print("已存在  %-24s -> %s" % (source, page.getRedirectTarget().title()))
+            continue
+        if not execute:
+            print("将创建  %-24s -> %s" % (source, target))
+            continue
+        try:
+            page.text = "#REDIRECT [[%s]]" % target
+            page.save(summary=" ", createonly=True)
+            created += 1
+            print("已创建  %-24s -> %s" % (source, target))
+        except Exception as exc:  # noqa: BLE001
+            failed += 1
+            print("失败    %-24s %s" % (source, repr(exc)[:140]))
+    for source, target in sorted(REDIRECT_REPAIRS.items()):
+        page = pywikibot.Page(zh, source)
+        want = "#REDIRECT [[%s]]" % target
+        if not page.exists():
+            print("缺失    %-24s（应重定向到 %s）" % (source, target))
+            continue
+        if page.text.strip() == want:
+            print("无需修  %-24s -> %s" % (source, target))
+            continue
+        if not execute:
+            print("将修正  %-24s -> %s（当前 %r）" % (source, target, page.text.strip()[:60]))
+            continue
+        page.text = want
+        page.save(summary=" ")
+        repaired += 1
+        print("已修正  %-24s -> %s" % (source, target))
+    print("--- 新建 %d，已存在 %d，修正 %d，失败 %d" % (created, existing, repaired, failed))
+    return 0
+
+
+def override_messages(execute: bool) -> int:
+    zh = pywikibot.Site("zhdoors", "zhdoors")
+    for title, value in sorted(MESSAGE_OVERRIDES.items()):
+        page = pywikibot.Page(zh, title)
+        current = page.text if page.exists() else None
+        if current == value:
+            print("已一致  %-28s = %s" % (title, value))
+            continue
+        if not execute:
+            print("将覆盖  %-28s %r -> %r" % (title, current, value))
+            continue
+        page.text = value
+        page.save(summary="页脚链接改指 DOORS Wiki: 命名空间页面")
+        print("已覆盖  %-28s = %s" % (title, value))
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--fetch", action="store_true", help="抓取英文站源码")
@@ -160,6 +253,8 @@ def main() -> int:
     parser.add_argument("--manifest", action="store_true", help="生成推送清单")
     parser.add_argument("--push", action="store_true", help="执行推送")
     parser.add_argument("--report", action="store_true", help="列出待翻译与中文站独有页面")
+    parser.add_argument("--redirects", action="store_true", help="补齐旧 Project:/中文别名重定向并修正错误重定向")
+    parser.add_argument("--messages", action="store_true", help="把页脚界面消息改指新页面")
     parser.add_argument("--apply", action="store_true", help="实际写入（默认 dry-run）")
     parser.add_argument("--force", action="store_true", help="内容一致时也推送（校验推送链路）")
     parser.add_argument("--only", help="只处理指定标题")
@@ -172,6 +267,10 @@ def main() -> int:
         return build_manifest(args.apply)
     if args.report:
         return report()
+    if args.redirects:
+        return sync_redirects(args.apply)
+    if args.messages:
+        return override_messages(args.apply)
     if args.push:
         return push(args.apply, args.force, args.only)
     # 无参数：全流程 dry-run
