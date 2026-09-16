@@ -84,7 +84,8 @@ def zh_titles_from_disk() -> list[str]:
 
 
 def manifest_path() -> Path:
-    return Path("push_project_%s.json" % date.today().isoformat())
+    """项目命名空间清单固定为 manifests/project.json（见 manifests/README.md）。"""
+    return Path("manifests/project.json")
 
 
 def build_manifest(execute: bool) -> int:

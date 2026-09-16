@@ -1,0 +1,578 @@
+[
+ {
+  "batch": "push_admin_panel_players_2026_09_15.json",
+  "title": "Admin Panel/Players",
+  "path": "pages_zh/batch_2026-09-15/Admin_Panel_Players.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_batch_2026_09_15.json",
+  "title": "Impacts",
+  "path": "_sync_out/Impacts.mw",
+  "file_exists": false
+ },
+ {
+  "batch": "push_batch_2026_09_15.json",
+  "title": "Doors Woman",
+  "path": "_sync_out/Doors Woman.mw",
+  "file_exists": false
+ },
+ {
+  "batch": "push_batch_2026_09_15.json",
+  "title": "Fire Sprinklers",
+  "path": "_sync_out/Fire Sprinklers.mw",
+  "file_exists": false
+ },
+ {
+  "batch": "push_batch_2026_09_15.json",
+  "title": "Doorswoman",
+  "path": "_sync_out/Doorswoman.mw",
+  "file_exists": false
+ },
+ {
+  "batch": "push_batch_2026_09_15.json",
+  "title": "Pushables",
+  "path": "_sync_out/Pushables.mw",
+  "file_exists": false
+ },
+ {
+  "batch": "push_batch_2026_09_15.json",
+  "title": "Me",
+  "path": "_sync_out/Me.mw",
+  "file_exists": false
+ },
+ {
+  "batch": "push_batch_2026_09_15.json",
+  "title": "Soundtracks/The Hotel",
+  "path": "_sync_out/Soundtracks__The Hotel.mw",
+  "file_exists": false
+ },
+ {
+  "batch": "push_batch_2026_09_15.json",
+  "title": "Soundtracks/The Rooms",
+  "path": "_sync_out/Soundtracks__The Rooms.mw",
+  "file_exists": false
+ },
+ {
+  "batch": "push_batch_2026_09_15.json",
+  "title": "Soundtracks/The Backdoor",
+  "path": "_sync_out/Soundtracks__The Backdoor.mw",
+  "file_exists": false
+ },
+ {
+  "batch": "push_batch_2026_09_15.json",
+  "title": "Soundtracks/The Outdoors",
+  "path": "_sync_out/Soundtracks__The Outdoors.mw",
+  "file_exists": false
+ },
+ {
+  "batch": "push_batch_2026_09_15.json",
+  "title": "Soundtracks/The Mines",
+  "path": "_sync_out/Soundtracks__The Mines.mw",
+  "file_exists": false
+ },
+ {
+  "batch": "push_batch_2026_09_15.json",
+  "title": "Soundtracks/The Stairwell",
+  "path": "_sync_out/Soundtracks__The Stairwell.mw",
+  "file_exists": false
+ },
+ {
+  "batch": "push_batch_2026_09_15.json",
+  "title": "Category:The Hotel entities",
+  "path": "_sync_out/Category__The Hotel entities.mw",
+  "file_exists": false
+ },
+ {
+  "batch": "push_batch_2026_09_15.json",
+  "title": "Category:The Mines entities",
+  "path": "_sync_out/Category__The Mines entities.mw",
+  "file_exists": false
+ },
+ {
+  "batch": "push_batch_2026_09_15.json",
+  "title": "Category:The Backdoor entities",
+  "path": "_sync_out/Category__The Backdoor entities.mw",
+  "file_exists": false
+ },
+ {
+  "batch": "push_batch_2026_09_15.json",
+  "title": "Category:The Archives entities",
+  "path": "_sync_out/Category__The Archives entities.mw",
+  "file_exists": false
+ },
+ {
+  "batch": "push_batch_2026_09_15.json",
+  "title": "Category:The Outdoors entities",
+  "path": "_sync_out/Category__The Outdoors entities.mw",
+  "file_exists": false
+ },
+ {
+  "batch": "push_batch_2026_09_15.json",
+  "title": "Category:The Stairwell entities",
+  "path": "_sync_out/Category__The Stairwell entities.mw",
+  "file_exists": false
+ },
+ {
+  "batch": "push_batch_2026_09_15.json",
+  "title": "Category:The Rooms entities",
+  "path": "_sync_out/Category__The Rooms entities.mw",
+  "file_exists": false
+ },
+ {
+  "batch": "push_pages10_2026_09_15.json",
+  "title": "Removed and Scrapped Content",
+  "path": "pages_zh/batch_2026-09-15/Removed_and_Scrapped_Content.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages11_2026_09_15.json",
+  "title": "Soundtracks/The Archives",
+  "path": "pages_zh/batch_2026-09-15/Soundtracks_The_Archives.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages12_2026_09_15.json",
+  "title": "Soundtracks/Volume 6",
+  "path": "pages_zh/batch_2026-09-15/Soundtracks_Volume_6.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages13_2026_09_15.json",
+  "title": "Soundtracks/In-game",
+  "path": "pages_zh/batch_2026-09-15/Soundtracks_In-game.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages14_2026_09_15.json",
+  "title": "Ambush",
+  "path": "pages_zh/batch_2026-09-15/Ambush.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages14_2026_09_15.json",
+  "title": "Giggle",
+  "path": "pages_zh/batch_2026-09-15/Giggle.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages15_2026_09_15.json",
+  "title": "Doors (feature)",
+  "path": "pages_zh/batch_2026-09-15/Doors_feature.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages16_2026_09_15.json",
+  "title": "The Archives",
+  "path": "pages_zh/batch_2026-09-15/The_Archives.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages17_2026_09_15.json",
+  "title": "Soundtracks/In-game",
+  "path": "pages_zh/batch_2026-09-15/Soundtracks_In-game.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages2_2026_09_15.json",
+  "title": "Item Skins",
+  "path": "pages_zh/batch_2026-09-15/Item_Skins.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages2_2026_09_15.json",
+  "title": "Rush",
+  "path": "pages_zh/batch_2026-09-15/Rush.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages2_2026_09_15.json",
+  "title": "Ransom",
+  "path": "pages_zh/batch_2026-09-15/Ransom.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages2_2026_09_15.json",
+  "title": "Dupe",
+  "path": "pages_zh/batch_2026-09-15/Dupe.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages2_2026_09_15.json",
+  "title": "Glitch Fragment",
+  "path": "pages_zh/batch_2026-09-15/Glitch_Fragment.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages3_2026_09_15.json",
+  "title": "Hijack",
+  "path": "pages_zh/batch_2026-09-15/Hijack.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages3_2026_09_15.json",
+  "title": "Seek",
+  "path": "pages_zh/batch_2026-09-15/Seek.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages3_2026_09_15.json",
+  "title": "Halt",
+  "path": "pages_zh/batch_2026-09-15/Halt.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages3_2026_09_15.json",
+  "title": "Screech",
+  "path": "pages_zh/batch_2026-09-15/Screech.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages3_2026_09_15.json",
+  "title": "Portrait",
+  "path": "pages_zh/batch_2026-09-15/Portrait.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages3_2026_09_15.json",
+  "title": "Players",
+  "path": "pages_zh/batch_2026-09-15/Players.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages3_2026_09_15.json",
+  "title": "BATTLE Mode",
+  "path": "pages_zh/batch_2026-09-15/BATTLE_Mode.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages3_2026_09_15.json",
+  "title": "2026 April Fools Event",
+  "path": "pages_zh/batch_2026-09-15/2026_April_Fools_Event.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages3_2026_09_15.json",
+  "title": "Daily Runs/Daily Streak",
+  "path": "pages_zh/batch_2026-09-15/Daily_Runs_Daily_Streak.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages3_2026_09_15.json",
+  "title": "Daily Runs/List of Runs",
+  "path": "pages_zh/batch_2026-09-15/Daily_Runs_List_of_Runs.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages4_2026_09_15.json",
+  "title": "List of Entities",
+  "path": "pages_zh/batch_2026-09-15/List_of_Entities.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages5_2026_09_15.json",
+  "title": "Red Light",
+  "path": "pages_zh/batch_2026-09-15/Red_Light.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages6_2026_09_15.json",
+  "title": "The Rooms",
+  "path": "pages_zh/batch_2026-09-15/The_Rooms.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages7_2026_09_15.json",
+  "title": "Creak",
+  "path": "pages_zh/batch_2026-09-15/Creak.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages7_2026_09_15.json",
+  "title": "A-90",
+  "path": "pages_zh/batch_2026-09-15/A-90.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages7_2026_09_15.json",
+  "title": "Moonlight",
+  "path": "pages_zh/batch_2026-09-15/Moonlight.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages7_2026_09_15.json",
+  "title": "Starlight",
+  "path": "pages_zh/batch_2026-09-15/Starlight.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages8_2026_09_15.json",
+  "title": "Cringle's Workshop Event",
+  "path": "pages_zh/batch_2026-09-15/Cringles_Workshop_Event.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages8_2026_09_15.json",
+  "title": "The Figure",
+  "path": "pages_zh/batch_2026-09-15/The_Figure.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages8_2026_09_15.json",
+  "title": "Glitch",
+  "path": "pages_zh/batch_2026-09-15/Glitch.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages9_2026_09_15.json",
+  "title": "Achievements",
+  "path": "pages_zh/batch_2026-09-15/Achievements.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages9_2026_09_15.json",
+  "title": "The Stairwell",
+  "path": "pages_zh/batch_2026-09-15/The_Stairwell.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages9_2026_09_15.json",
+  "title": "Soundtracks/Promotional",
+  "path": "pages_zh/batch_2026-09-15/Soundtracks_Promotional.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages_2026_09_15.json",
+  "title": "Hazards",
+  "path": "pages_zh/batch_2026-09-15/Hazards.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages_2026_09_15.json",
+  "title": "Minecart",
+  "path": "pages_zh/batch_2026-09-15/Minecart.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages_2026_09_15.json",
+  "title": "Game Mechanics",
+  "path": "pages_zh/batch_2026-09-15/Game_Mechanics.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages_2026_09_15.json",
+  "title": "Grampy",
+  "path": "pages_zh/batch_2026-09-15/Grampy.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages_2026_09_15.json",
+  "title": "Dialogue",
+  "path": "pages_zh/batch_2026-09-15/Dialogue.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages_2026_09_15.json",
+  "title": "Meld",
+  "path": "pages_zh/batch_2026-09-15/Meld.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages_2026_09_15.json",
+  "title": "Stem",
+  "path": "pages_zh/batch_2026-09-15/Stem.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages_2026_09_15.json",
+  "title": "Disc",
+  "path": "pages_zh/batch_2026-09-15/Disc.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages_2026_09_15.json",
+  "title": "Honcho",
+  "path": "pages_zh/batch_2026-09-15/Honcho.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages_2026_09_15.json",
+  "title": "Alma",
+  "path": "pages_zh/batch_2026-09-15/Alma.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_pages_2026_09_15.json",
+  "title": "Soundtracks",
+  "path": "pages_zh/batch_2026-09-15/Soundtracks.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:AI policy",
+  "path": "pages_zh/project/AI policy.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:About",
+  "path": "pages_zh/project/About.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:Administrators",
+  "path": "pages_zh/project/Administrators.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:Autoconfirmed users",
+  "path": "pages_zh/project/Autoconfirmed users.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:Awards",
+  "path": "pages_zh/project/Awards.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:Bots",
+  "path": "pages_zh/project/Bots.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:Bureaucrats",
+  "path": "pages_zh/project/Bureaucrats.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:Content-moderator",
+  "path": "pages_zh/project/Content-moderator.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:Contributors",
+  "path": "pages_zh/project/Contributors.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:Copyright",
+  "path": "pages_zh/project/Copyright.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:Copyrights",
+  "path": "pages_zh/project/Copyrights.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:General disclaimer",
+  "path": "pages_zh/project/General disclaimer.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:Image policy",
+  "path": "pages_zh/project/Image policy.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:MOS",
+  "path": "pages_zh/project/MOS.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:Manual of Style",
+  "path": "pages_zh/project/Manual of Style.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:Notability",
+  "path": "pages_zh/project/Notability.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:Policies",
+  "path": "pages_zh/project/Policies.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:Policy",
+  "path": "pages_zh/project/Policy.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:Render policy",
+  "path": "pages_zh/project/Render policy.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:Rollback",
+  "path": "pages_zh/project/Rollback.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:Rules",
+  "path": "pages_zh/project/Rules.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:Staff",
+  "path": "pages_zh/project/Staff.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:Threadmoderator",
+  "path": "pages_zh/project/Threadmoderator.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:User rights",
+  "path": "pages_zh/project/User rights.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:Wiki Contributors",
+  "path": "pages_zh/project/Wiki Contributors.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:格式规范",
+  "path": "pages_zh/project/格式规范.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:计划/条目视频化",
+  "path": "pages_zh/project/计划__条目视频化.zh.mw",
+  "file_exists": true
+ },
+ {
+  "batch": "push_project_2026-09-16.json",
+  "title": "DOORS Wiki:计划/条目视频化/视频列表",
+  "path": "pages_zh/project/计划__条目视频化__视频列表.zh.mw",
+  "file_exists": true
+ }
+]
