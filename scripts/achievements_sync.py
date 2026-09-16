@@ -895,7 +895,7 @@ def save_module_text(site: pywikibot.Site, rows: list[dict[str, Any]]) -> int:
         data = site.simple_request(
             action="parse",
             text="{{#invoke:BadgeList|main|BadgeCount|All}}",
-            title="Project:Sandbox",
+            title="DOORS Wiki:Sandbox",
             prop="text",
             disablelimitreport="1",
             formatversion="2",

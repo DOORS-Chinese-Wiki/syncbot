@@ -38,6 +38,7 @@ Template: / Module: 页面
 | `grist_import_exports.py` | 把腾讯导出的 xlsx 导入 Grist |
 | `grist_dedupe.py` | 清理 Grist 里的重复 key |
 | `diff_en_window.py` | 按时间窗比对英文站改动，用于跟进更新 |
+| `sync_project_pages.py` | 同步 `DOORS Wiki:` 项目命名空间页面（英文源 → 中文译文 → 清单 → 推送） |
 
 测试：`python scripts/test_achievements_sync.py`、`test_item_names_sync.py`（离线，不联网）。
 
