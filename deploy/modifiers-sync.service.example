@@ -1,0 +1,17 @@
+[Unit]
+Description=DOORS Wiki ModifierData sync
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/doors-wiki
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/doors-wiki/.venv/bin/python -u /opt/doors-wiki/scripts/modifiers_sync.py watch --interval 30 --apply
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/modifiers-sync.log
+StandardError=append:/var/log/modifiers-sync.log
+
+[Install]
+WantedBy=multi-user.target

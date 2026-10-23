@@ -15,8 +15,12 @@ services:
       GRIST_SINGLE_ORG: ${GRIST_SINGLE_ORG}
       # 会话签名密钥，务必随机且保密
       GRIST_SESSION_SECRET: ${GRIST_SESSION_SECRET}
-      # 首个管理员邮箱（首次打开页面时用它注册）
-      GRIST_DEFAULT_EMAIL: ${GRIST_DEFAULT_EMAIL}
+      # Nginx Basic Auth 通过后，把邮箱身份传给 Grist
+      GRIST_LOGIN_SYSTEM_TYPE: ${GRIST_LOGIN_SYSTEM_TYPE}
+      GRIST_FORWARD_AUTH_HEADER: ${GRIST_FORWARD_AUTH_HEADER}
+      GRIST_IGNORE_SESSION: ${GRIST_IGNORE_SESSION}
+      GRIST_FORCE_LOGIN: ${GRIST_FORCE_LOGIN}
+      GRIST_IN_SERVICE: ${GRIST_IN_SERVICE}
       TZ: ${TZ:-Asia/Shanghai}
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8484/status').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]

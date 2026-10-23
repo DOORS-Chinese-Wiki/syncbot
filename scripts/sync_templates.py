@@ -25,6 +25,7 @@ NS_TEMPLATE = 10
 NS_MODULE = 828
 CHUNK = 50
 APPLY = '--apply' in sys.argv
+CHECK_ONLY = '--check-only' in sys.argv
 
 UA = ('doors-wiki-sync/1.0 (https://zh.doorsgame.wiki; '
       'sync between doorsgame.wiki and zh.doorsgame.wiki)')
@@ -168,6 +169,23 @@ def main():
     missing = [t for t in titles if 'missing' in exists.get(t, {'missing': 1})]
     log('[plan] target already has: %d ; to import: %d'
         % (len(titles) - len(missing), len(missing)))
+
+    if CHECK_ONLY:
+        src_texts = fetch_texts(SRC, titles)
+        dst_texts = fetch_texts(DST, titles)
+        mismatched = []
+        for title in titles:
+            source_text = src_texts.get(title) or ''
+            target_text = dst_texts.get(title) or ''
+            if source_text == target_text:
+                continue
+            mismatched.append((title, len(source_text), len(target_text)))
+        log('[check] content mismatches: %d' % len(mismatched))
+        for title, source_len, target_len in mismatched:
+            state = 'missing' if title in missing else 'diff'
+            log('  %-5s %-48s en=%-6d zh=%d'
+                % (state, title, source_len, target_len))
+        return
 
     if not APPLY:
         log('[plan] DRY-RUN mode: no writes. Re-run with --apply to sync.')

@@ -8,7 +8,7 @@ import requests
 from openpyxl import load_workbook
 
 SERVER = "https://sheet.189-24-78-35.sslip.io"
-KEY = os.environ.get("GRIST_KEY", "")
+KEY = os.environ.get("GRIST_API_KEY", os.environ.get("GRIST_KEY", ""))
 DOC_ID = os.environ.get("GRIST_DOC_ID", "1JRoy2vJar2kh945PXUbFP")
 
 ITEM_COLUMNS = [
@@ -29,6 +29,14 @@ ACHIEVEMENT_COLUMNS = [
     ("badge_id", "Badge ID"), ("old_versions", "旧版本"),
     ("wiki_rev", "Wiki 修订"), ("row_hash", "行哈希"),
     ("sync_status", "同步状态"),
+]
+MODIFIER_COLUMNS = [
+    ("key", "同步键"), ("category", "分类"), ("title", "修饰符名"),
+    ("description", "中文描述"), ("description_en", "英文描述"),
+    ("requirements", "需求"), ("exclusive", "限定"), ("knobs", "旋钮"),
+    ("rift", "Rift"), ("progress", "进度"), ("group", "分组"),
+    ("reason", "移除原因"), ("wiki_rev", "Wiki 修订"),
+    ("row_hash", "行哈希"), ("sync_status", "同步状态"),
 ]
 
 
@@ -69,8 +77,10 @@ def main() -> int:
             print("   ", resp.text[:300])
         return ok
 
-    for name in tables():
-        apply([["RemoveTable", name]])
+    # 只重建从 xlsx 导入的两张表；Modifiers 由 modifiers_sync.py 维护。
+    for name in ("ItemNames", "Achievements"):
+        if name in tables():
+            apply([["RemoveTable", name]])
     for table_id, columns in (
         ("ItemNames", ITEM_COLUMNS),
         ("Achievements", ACHIEVEMENT_COLUMNS),
@@ -78,6 +88,11 @@ def main() -> int:
         apply([["AddTable", table_id, [
             {"id": cid, "label": label, "type": "Text"}
             for cid, label in columns
+        ]]])
+    if "Modifiers" not in tables():
+        apply([["AddTable", "Modifiers", [
+            {"id": cid, "label": label, "type": "Text"}
+            for cid, label in MODIFIER_COLUMNS
         ]]])
     print("表:", tables())
 

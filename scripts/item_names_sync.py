@@ -72,6 +72,65 @@ COLUMNS = {
     "confirmed": 15,
     "note": 16,
 }
+# 表头文字 -> 字段。插列/挪列不会打乱读取；缺列时按字段名告警。
+HEADER_TO_COLUMN = {
+    "英文名": "key",
+    "建议中文译名": "suggested",
+    "备选译名1": "alt1",
+    "备选译名2": "alt2",
+    "备选译名3": "alt3",
+    "备选译名4": "alt4",
+    "最终译名": "final",
+    "选择依据": "reason",
+    "分类": "category",
+    "页面状态": "page",
+    "翻译来源": "source",
+    "处理状态": "status",
+    "优先级": "priority",
+    "负责人": "owner",
+    "确认日期": "confirmed",
+    "备注": "note",
+}
+# 「备选译名N」统一归入 alternatives 字段
+ALT_FIELD_PREFIX = "alt"
+
+
+def resolve_columns(matrix: list[list[Any]]) -> tuple[dict[str, int], list[str]]:
+    """按表头文字解析列号。返回 (字段->列号, 告警)。
+
+    表头缺失或异常时回退到 COLUMNS，保证旧表仍可读。
+    """
+    warnings: list[str] = []
+    header = matrix[HEADER_ROW - 1] if len(matrix) >= HEADER_ROW else []
+    mapping: dict[str, int] = {}
+    for index, raw in enumerate(header):
+        name = "" if raw is None else str(raw).strip()
+        field = HEADER_TO_COLUMN.get(name)
+        if field:
+            mapping[field] = index
+    if not mapping:
+        warnings.append("第 %d 行未识别到表头，回退到内置列号" % HEADER_ROW)
+        return _fallback_columns(), warnings
+    missing = [f for f in HEADER_TO_COLUMN.values() if f not in mapping]
+    if missing:
+        warnings.append(
+            "表头缺少列：%s（这些字段将读取为空）"
+            % "、".join(sorted(set(missing)))
+        )
+    return mapping, warnings
+
+
+def _fallback_columns() -> dict[str, int]:
+    flat: dict[str, int] = {}
+    for field, value in COLUMNS.items():
+        if field == "alternatives":
+            for i, index in enumerate(value):
+                flat["alt%d" % (i + 1)] = index
+        else:
+            flat[field] = value
+    return flat
+
+
 MIRROR_FIELDS = (
     "final", "suggested", "alternatives", "reason", "category", "page",
     "source", "status", "priority", "owner", "confirmed", "note",
@@ -257,37 +316,39 @@ def cell(values: list[Any], index: int) -> str:
 
 def read_sheet(instance: A.TencentDocsClient) -> tuple[list[dict[str, Any]], list[str]]:
     matrix = instance.get_range("A1:Q200")
-    warnings: list[str] = []
+    columns, warnings = resolve_columns(matrix)
+
+    def at(values: list[Any], field: str) -> str:
+        index = columns.get(field)
+        return cell(values, index) if index is not None else ""
+
     rows: list[dict[str, Any]] = []
     seen: dict[str, int] = {}
     for offset, values in enumerate(matrix[HEADER_ROW:], start=HEADER_ROW + 1):
-        key = cell(values, COLUMNS["key"])
+        key = at(values, "key")
         if not key:
             continue
-        category = cell(values, COLUMNS["category"])
-        page = cell(values, COLUMNS["page"])
+        category = at(values, "category")
+        page = at(values, "page")
         if not category and not page:
             warnings.append(f"第 {offset} 行 [{key}] 分类与页面状态皆空，已跳过")
             continue
-        alternatives = [
-            cell(values, index) for index in COLUMNS["alternatives"]
-            if cell(values, index)
-        ]
+        alternatives = [v for v in (at(values, f) for f in ALT_COLUMNS) if v]
         row = {
             "key": key,
             "_row": offset,
-            "suggested": cell(values, COLUMNS["suggested"]),
+            "suggested": at(values, "suggested"),
             "alternatives": alternatives,
-            "final": cell(values, COLUMNS["final"]),
-            "reason": cell(values, COLUMNS["reason"]),
+            "final": at(values, "final"),
+            "reason": at(values, "reason"),
             "category": category,
             "page": page,
-            "source": cell(values, COLUMNS["source"]),
-            "status": cell(values, COLUMNS["status"]),
-            "priority": cell(values, COLUMNS["priority"]),
-            "owner": cell(values, COLUMNS["owner"]),
-            "confirmed": cell(values, COLUMNS["confirmed"]),
-            "note": cell(values, COLUMNS["note"]),
+            "source": at(values, "source"),
+            "status": at(values, "status"),
+            "priority": at(values, "priority"),
+            "owner": at(values, "owner"),
+            "confirmed": at(values, "confirmed"),
+            "note": at(values, "note"),
         }
         if key in seen:
             warnings.append(

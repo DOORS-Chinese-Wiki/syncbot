@@ -1,5 +1,5 @@
 [Unit]
-Description=腾讯文档 → Grist 物品/成就同步（腾讯为主）
+Description=腾讯文档 → Grist 物品/成就/修饰符同步（腾讯为主）
 After=network-online.target
 Wants=network-online.target
 

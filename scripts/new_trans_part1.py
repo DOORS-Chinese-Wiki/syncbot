@@ -1,0 +1,56 @@
+# -*- coding: utf-8 -*-
+"""Build new zh Module:BadgeData from latest EN + existing zh + new translations."""
+import re, json
+from pathlib import Path
+
+TEXT_NEW = {
+  "We didn't playtest this to make sure this was possible": "我们没测试过这到底能不能做到",
+  "This was only obtainable before the HOTEL+ update!": "该徽章只能在 HOTEL+ 更新之前获得！",
+  "This was only obtainable before The Great Outdoors update!": "该徽章只能在 The Great Outdoors 更新之前获得！",
+  "TEMPORARY. WILL BE SHORTLY REMOVED!": "临时内容，即将移除！",
+}
+
+DIR_NEW = {
+  "Escape [[Seek]] in [[the Mines]].": "在 The Mines 逃离 [[Seek]]。",
+  "Use a Depot to earn some [[Gold]]": "用 Depot 赚点 [[Gold]]。",
+  "Successfully disable [[Noise]].": "成功关闭 [[Noise]]。",
+  "Walk through the entire queue line in [[the Archives]].": "走完 The Archives 的整条排队线。",
+  "Escape from [[the Library]] in [[the Hotel]].": "从 [[the Hotel]] 的 [[Library]] 逃出。",
+  "Purchase an [[Items|item]] from [[Jeff]].": "在 [[Jeff]] 那里购买一件[[Items|物品]]。",
+  "Successfully survive a stampede of [[Drone]]s.": "在 [[Drone]] 的踩踏潮中存活。",
+  "Have a full hotbar of [[Items#Light|light sources]].": "物品栏装满[[Items#Light|光源]]。",
+  "Have a full hotbar of [[Items#Food|edibles items]].": "物品栏装满[[Items#Food|食物]]。",
+  "Enter a [[Floors|subfloor]]. Receive their acknowledgment.": "进入一个[[Floors|子楼层]]。得到它们的认可。",
+  "Use a [[Crucifix]] against [[Rush]].": "对 [[Rush]] 使用 [[Crucifix|十字架]]。",
+  "Use a [[Crucifix]] against [[Ambush]].": "对 [[Ambush]] 使用 [[Crucifix|十字架]]。",
+  "Use a [[Crucifix]] against [[Seek]].": "对 [[Seek]] 使用 [[Crucifix|十字架]]。",
+  "Use a [[Crucifix]] against [[Figure]].": "对 [[Figure]] 使用 [[Crucifix|十字架]]。",
+  "Use a [[Crucifix]] against the [[Eyes]].": "对 [[Eyes]] 使用 [[Crucifix|十字架]]。",
+  "Use a [[Crucifix]] against [[Screech]].": "对 [[Screech]] 使用 [[Crucifix|十字架]]。",
+  "Use a [[Crucifix]] against [[Halt]].": "对 [[Halt]] 使用 [[Crucifix|十字架]]。",
+  "Use a [[Crucifix]] against [[Dupe]].": "对 [[Dupe]] 使用 [[Crucifix|十字架]]。",
+  "Use a [[Crucifix]] against [[Dread]].": "对 [[Dread]] 使用 [[Crucifix|十字架]]。",
+  "...'Use' a [[Crucifix]] against [[Timothy]].": "……对 [[Timothy]] “使用” [[Crucifix|十字架]]。",
+  "Use a [[Crucifix]] against [[Void]].": "对 [[Void]] 使用 [[Crucifix|十字架]]。",
+  "Use a [[Crucifix]] against [[Hide]].": "对 [[Hide]] 使用 [[Crucifix|十字架]]。",
+  "Use a [[Crucifix]] against [[Blitz]].": "对 [[Blitz]] 使用 [[Crucifix|十字架]]。",
+  "Use a [[Crucifix]] against [[Lookman]].": "对 [[Lookman]] 使用 [[Crucifix|十字架]]。",
+  "Use a [[Crucifix]] against [[Haste]].": "对 [[Haste]] 使用 [[Crucifix|十字架]]。",
+  "Use a [[Crucifix]] against a swarm of [[Gloombats]].": "对一群 [[Gloombats]] 使用 [[Crucifix|十字架]]。",
+  "Use a [[Crucifix]] against [[Giggle]].": "对 [[Giggle]] 使用 [[Crucifix|十字架]]。",
+  "Use a [[Crucifix]] against [[Grumble]].": "对 [[Grumble]] 使用 [[Crucifix|十字架]]。",
+  "Use a [[Crucifix]] against [[Queen Grumble]].": "对 [[Queen Grumble]] 使用 [[Crucifix|十字架]]。",
+  "Use a [[Crucifix]] against [[Louie]].": "对 [[Louie]] 使用 [[Crucifix|十字架]]。",
+  "Use a [[Crucifix]] against [[Sally]].": "对 [[Sally]] 使用 [[Crucifix|十字架]]。",
+  "Banish [[Portrait]] with a [[Crucifix]]": "用 [[Crucifix|十字架]] 放逐 [[Portrait]]。",
+  "Escape [[The Hotel]] with at least a 50% bonus using [[Modifiers]].": "使用[[Modifiers|修饰符]]，以至少 50% 加成逃离 [[The Hotel]]。",
+  "Escape [[The Hotel]] with at least a 150% bonus using [[Modifiers]].": "使用[[Modifiers|修饰符]]，以至少 150% 加成逃离 [[The Hotel]]。",
+  "Escape [[The Mines]] with at least a 50% bonus using [[Modifiers]].": "使用[[Modifiers|修饰符]]，以至少 50% 加成逃离 [[The Mines]]。",
+  "Escape [[The Mines]] with at least a 150% bonus using [[Modifiers]].": "使用[[Modifiers|修饰符]]，以至少 150% 加成逃离 [[The Mines]]。",
+  "Complete the Vision of [[Cringle's Workshop Event|Cringle's Workshop]] during the 2025 holidays.": "在 2025 年节日季完成 [[Cringle's Workshop Event|Cringle's Workshop]] 的 Vision。",
+  "Escape [[The Backdoor]] during THE HUNT: First Edition.": "在 THE HUNT: First Edition 期间逃离 [[The Backdoor]]。",
+  "Escape [[The Hotel]].": "逃离 [[The Hotel]]。",
+  "Enter a [[Floors|subfloor]]. Receive their acknowledgement.": "进入一个[[Floors|子楼层]]。得到它们的认可。",
+  "Escape [[The Rooms]].": "逃离 [[The Rooms]]。",
+  "Escape Hotel & Mines with some restrictions.": "在若干限制下逃离 Hotel 与 Mines。",
+}

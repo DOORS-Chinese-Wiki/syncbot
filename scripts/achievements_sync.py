@@ -40,11 +40,22 @@ CATEGORY_ORDER = [
     "Unlisted",
 ]
 
-EDITABLE_FIELDS = ("category", "title", "text", "directions", "tutorial", "references")
+EDITABLE_FIELDS = (
+    "category",
+    "title",
+    "title_en",
+    "text",
+    "directions",
+    "tutorial",
+    "references",
+)
 HEADER_TO_FIELD = {
     "同步键": "key",
     "分类": "category",
     "成就名": "title",
+    "英文名": "title_en",
+    "Title EN": "title_en",
+    "TitleEn": "title_en",
     "描述": "text",
     "达成条件": "directions",
     "攻略": "tutorial",
@@ -81,12 +92,24 @@ STATUS_SHEET_UPDATED = "表格有更新"
 STATUS_CONFLICT = "冲突：两端均变化"
 STATUS_WIKI_DELETED = "Wiki 已删除"
 STATUS_LEGACY_SYNCED = ("", "synced", STATUS_SYNCED)
-MATRIX_WIDTH = 16
+MATRIX_WIDTH = 17
+
+
+def last_col(width: int = MATRIX_WIDTH) -> str:
+    """返回 width 列对应的 Excel 末列字母（16 -> "P"，17 -> "Q"）。"""
+    name, n = "", width
+    while n:
+        n, r = divmod(n - 1, 26)
+        name = chr(65 + r) + name
+    return name
+
+
 CSV_FIELDS = [
     "key",
     "wiki_rev",
     "category",
     "title",
+    "title_en",
     "text",
     "directions",
     "tutorial",
@@ -260,6 +283,16 @@ def row_hash(row: dict[str, Any]) -> str:
     return hashlib.sha1(encoded).hexdigest()
 
 
+def stable_badge_key(row: dict[str, Any]) -> str:
+    """以稳定的英文原名建立键，显示名翻译不会改变身份。"""
+    category = str(row.get("category", "")).strip()
+    badge_id = str(row.get("badge_id", "")).strip()
+    title_en = str(row.get("title_en") or row.get("title") or "").strip()
+    if badge_id:
+        return f"id:{badge_id}:{category}:{title_en}"
+    return f"title:{category}:{title_en}"
+
+
 def parse_module(text: str, revision: int) -> list[dict[str, Any]]:
     root_start = text.index("{", text.index("return"))
     root_end = matching_brace(text, root_start)
@@ -282,19 +315,16 @@ def parse_module(text: str, revision: int) -> list[dict[str, Any]]:
             title = string_field(fields, "title")
             if not title:
                 continue
+            title_en = string_field(fields, "titleEn") or title
             badge_id = string_field(fields, "id")
             if badge_id == "nil":
                 badge_id = ""
-            key = (
-                f"id:{badge_id}:{category}:{title}"
-                if badge_id
-                else f"title:{category}:{title}"
-            )
             row = {
-                "key": key,
+                "key": "",
                 "wiki_rev": revision,
                 "category": category,
                 "title": title,
+                "title_en": title_en,
                 "text": string_field(fields, "text"),
                 "directions": string_field(fields, "directions"),
                 "tutorial": string_field(fields, "tutorial"),
@@ -306,6 +336,7 @@ def parse_module(text: str, revision: int) -> list[dict[str, Any]]:
                 "badge_id": badge_id,
                 "old_versions": fields.get("oldVersions", "nil"),
             }
+            row["key"] = stable_badge_key(row)
             row["row_hash"] = row_hash(row)
             row["sync_status"] = STATUS_SYNCED
             rows.append(row)
@@ -344,6 +375,7 @@ def merge_sheet_row(row: dict[str, str]) -> dict[str, Any]:
     merged: dict[str, Any] = {
         "category": row.get("category", "").strip(),
         "title": row.get("title", "").strip(),
+        "title_en": row.get("title_en", "").strip(),
         "text": row.get("text", ""),
         "directions": row.get("directions", ""),
         "tutorial": row.get("tutorial", ""),
@@ -357,13 +389,11 @@ def merge_sheet_row(row: dict[str, str]) -> dict[str, Any]:
         "wiki_rev": row.get("wiki_rev", ""),
         "sync_status": row.get("sync_status", ""),
     }
+    if not merged["title_en"]:
+        merged["title_en"] = merged["title"]
     key = row.get("key", "").strip()
     if not key:
-        key = (
-            f"id:{merged['badge_id']}:{merged['category']}:{merged['title']}"
-            if merged["badge_id"]
-            else f"title:{merged['category']}:{merged['title']}"
-        )
+        key = stable_badge_key(merged)
     merged["key"] = key
     merged["row_hash"] = row_hash(merged)
     return merged
@@ -636,11 +666,29 @@ def matrix_to_rows(matrix: list[list[str]]) -> list[dict[str, Any]]:
     return rows
 
 
+_CJK_RE = re.compile(r"[\u4e00-\u9fff]")
+
+
+def title_en_for(row: dict[str, Any]) -> str:
+    """取英文名：优先 title_en，若它是中文（表格无「英文名」列时的回退值），
+    则从 key 末尾取——key 形如 id:<id>:<分类>:<英文名> 或 title:<分类>:<英文名>。"""
+    value = str(row.get("title_en", "")).strip()
+    if value and not _CJK_RE.search(value):
+        return value
+    key = str(row.get("key", ""))
+    if key:
+        tail = key.rsplit(":", 1)[-1].strip()
+        if tail and not _CJK_RE.search(tail):
+            return tail
+    return value
+
+
 def rows_to_matrix(rows: list[dict[str, Any]]) -> list[list[Any]]:
     matrix: list[list[Any]] = [[
         "同步键",
         "分类",
         "成就名",
+        "英文名",
         "描述",
         "达成条件",
         "攻略",
@@ -656,10 +704,13 @@ def rows_to_matrix(rows: list[dict[str, Any]]) -> list[list[Any]]:
         "同步状态",
     ]]
     for row in rows:
+        if not row.get("key"):
+            row["key"] = stable_badge_key(row)
         matrix.append([
             str(row.get("key", "")),
             str(row.get("category", "")),
             str(row.get("title", "")),
+            title_en_for(row),
             str(row.get("text", "")),
             str(row.get("directions", "")),
             str(row.get("tutorial", "")),
@@ -722,9 +773,15 @@ def render_module(rows: list[dict[str, Any]]) -> str:
             text = row.get("text", "")
             directions = row.get("directions", "")
             tutorial = row.get("tutorial", "")
+            title_en = row.get("title_en") or ""
             out.extend([
                 "\t\t{",
                 f"\t\t\ttitle = {lua_quote(row.get('title', ''))},",
+                *(
+                    [f"\t\t\ttitleEn = {lua_quote(title_en)},"]
+                    if title_en and title_en != row.get("title", "")
+                    else []
+                ),
                 f"\t\t\ttext = {lua_quote(text) if text else 'nil'},",
                 f"\t\t\tdirections = {lua_quote(directions) if directions else 'nil'},",
                 f"\t\t\ttutorial = {lua_quote(tutorial) if tutorial else 'nil'},",
@@ -773,6 +830,26 @@ def _field_value(row: dict[str, Any], field: str) -> str:
     return "" if value is None else str(value)
 
 
+def _repair_badge_id(row: dict[str, Any]) -> dict[str, Any]:
+    """badge_id 必须是纯数字；被污染成 true/false 时从 key 中恢复。
+
+    key 形如 id:<数字>:<分类>:<英文名>，第二段就是权威 ID。
+    """
+    row = dict(row)
+    value = str(row.get("badge_id", "")).strip()
+    key = str(row.get("key", ""))
+    if key.startswith("title:"):
+        # 表格键表明这一行本就没有 Badge ID：不要凭空造一个出来。
+        row["badge_id"] = value if value.isdigit() else ""
+        return row
+    if value.isdigit():
+        return row
+    parts = key.split(":")
+    if len(parts) >= 2 and parts[0] == "id" and parts[1].strip().isdigit():
+        row["badge_id"] = parts[1].strip()
+    return row
+
+
 class GristSheet:
     """把 Grist 的 Achievements 表当作表格后端，行结构与腾讯侧一致。"""
 
@@ -793,14 +870,19 @@ class GristSheet:
             self.url, params={"limit": 2000}, timeout=120
         ).json().get("records", []):
             fields = record.get("fields") or {}
-            row = {field: _field_value(fields, field)
-                   for field in CSV_FIELDS}
+            row = merge_sheet_row(_repair_badge_id({
+                field: _field_value(fields, field)
+                for field in CSV_FIELDS
+            }))
+            # Grist 的 key 列可能仍是旧版含显示名的键，这里统一重算。
+            row["key"] = stable_badge_key(row)
             row[GRIST_ID_FIELD] = record.get("id")
             rows.append(row)
         return rows
 
     def _payload(self, row: dict[str, Any]) -> dict[str, str]:
-        return {field: _field_value(row, field) for field in CSV_FIELDS}
+        repaired = _repair_badge_id(row)
+        return {field: _field_value(repaired, field) for field in CSV_FIELDS}
 
     def patch(self, rows: list[dict[str, Any]]) -> int:
         groups: dict[tuple, list[dict[str, Any]]] = {}
@@ -879,11 +961,160 @@ def replace_wiki_fields(
     updated = dict(target)
     for field in EDITABLE_FIELDS:
         updated[field] = source.get(field, "")
+    target_title_en = (
+        updated.get("title_en")
+        or source.get("title_en")
+        or updated.get("title", "")
+    )
+    if source.get("title") == target_title_en:
+        # 表格端仍保留英文原名时，不要用英文回写中文显示名。
+        updated["title"] = target.get("title", "")
+    updated["title_en"] = target_title_en
     for field in ("rewards", "secret", "hidden", "obtainable", "badge_id", "old_versions"):
         if field in source:
             updated[field] = source[field]
     updated["row_hash"] = row_hash(updated)
     return updated
+
+
+def _record_id(row: dict[str, Any]) -> int:
+    try:
+        return int(row.get("_id") or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def dedupe_sheet_rows(
+    rows: list[dict[str, Any]],
+    wiki_rows: dict[str, dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
+    """同名/翻译造成的重复后端行只保留一条规范数据。"""
+    wiki_rows = wiki_rows or {}
+    wiki_candidates = list(wiki_rows.values())
+
+    def normalize_with_wiki(row: dict[str, Any]) -> dict[str, Any]:
+        row = dict(row)
+        badge_id = str(row.get("badge_id", "")).strip()
+        category = str(row.get("category", "")).strip()
+        title = str(row.get("title", "")).strip()
+        if not badge_id:
+            return row
+        wiki = next((
+            item for item in wiki_candidates
+            if item.get("badge_id") == badge_id
+            and item.get("category") == category
+            and title in {item.get("title"), item.get("title_en")}
+        ), None)
+        if wiki:
+            row["title_en"] = wiki.get("title_en") or wiki.get("title", "")
+            row["key"] = stable_badge_key(row)
+        return row
+
+    grouped: dict[str, list[dict[str, Any]]] = {}
+    for row in rows:
+        normalized = normalize_with_wiki(row)
+        grouped.setdefault(normalized.get("key", ""), []).append(normalized)
+
+    deduped: list[dict[str, Any]] = []
+    for key, candidates in sorted(grouped.items()):
+        pool = candidates
+        wiki = wiki_rows.get(key)
+        if wiki:
+            exact_title = [
+                row for row in candidates
+                if row.get("title") == wiki.get("title")
+            ]
+            exact_title_en = [
+                row for row in candidates
+                if row.get("title_en") == wiki.get("title_en")
+            ]
+            pool = exact_title or exact_title_en or candidates
+        deduped.append(max(pool, key=_record_id))
+    return deduped
+
+
+def _split_legacy_state_key(key: str) -> tuple[str, str, str] | None:
+    match = re.fullmatch(r"id:([^:]+):([^:]+):(.*)", key, re.S)
+    if match:
+        return match.group(1), match.group(2), match.group(3)
+    match = re.fullmatch(r"title:([^:]+):(.*)", key, re.S)
+    if match:
+        return "", match.group(1), match.group(2)
+    return None
+
+
+def migrate_state(
+    state: dict[str, Any],
+    wiki_rows: dict[str, dict[str, Any]],
+    sheet_rows: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    """迁移旧键并保留当前实际行对应的哈希，避免改名被误判删除。"""
+    all_rows = list(wiki_rows.values()) + list(sheet_rows.values())
+
+    def mapped_key(old_key: str) -> str:
+        identity = _split_legacy_state_key(old_key)
+        if not identity:
+            return old_key
+        badge_id, category, title = identity
+        match = next((
+            row for row in all_rows
+            if row.get("badge_id") == badge_id
+            and row.get("category") == category
+            and title in {row.get("title"), row.get("title_en")}
+        ), None)
+        if match:
+            return match["key"]
+        return stable_badge_key({
+            "badge_id": badge_id,
+            "category": category,
+            "title": title,
+        })
+
+    grouped: dict[str, list[dict[str, Any]]] = {}
+    for old_key, entry in state.get("rows", {}).items():
+        grouped.setdefault(mapped_key(old_key), []).append(entry)
+
+    migrated: dict[str, dict[str, Any]] = {}
+    for key in sorted(set(grouped) | set(wiki_rows) | set(sheet_rows)):
+        candidates = grouped.get(key, [])
+        wiki = wiki_rows.get(key)
+        sheet = sheet_rows.get(key)
+        wiki_hash = row_hash(wiki) if wiki else ""
+        sheet_hash = row_hash(sheet) if sheet else ""
+
+        if wiki:
+            exact = next(
+                (entry for entry in candidates
+                 if entry.get("wiki_hash") == wiki_hash),
+                None,
+            )
+            if not exact:
+                exact = next(
+                    (entry for entry in candidates if entry.get("wiki_hash")),
+                    {},
+                )
+            wiki_hash = exact.get("wiki_hash") or wiki_hash
+        if sheet:
+            exact = next(
+                (entry for entry in candidates
+                 if entry.get("sheet_hash") == sheet_hash),
+                None,
+            )
+            if not exact:
+                exact = next(
+                    (entry for entry in candidates if entry.get("sheet_hash")),
+                    {},
+                )
+            sheet_hash = exact.get("sheet_hash") or sheet_hash
+
+        entry: dict[str, Any] = {"wiki_hash": wiki_hash, "sheet_hash": sheet_hash}
+        if not wiki and any(item.get("wiki_deleted") for item in candidates):
+            entry["wiki_deleted"] = True
+        if not sheet and any(item.get("sheet_deleted") for item in candidates):
+            entry["sheet_deleted"] = True
+        migrated[key] = entry
+
+    return {"revision": state.get("revision", 0), "rows": migrated}
 
 
 def save_module_text(site: pywikibot.Site, rows: list[dict[str, Any]]) -> int:
@@ -920,10 +1151,13 @@ def run_sync(apply: bool, state_path: Path, backend: str = "grist") -> int:
         sheet_rows = grist.fetch()
     else:
         client = TencentDocsClient()
-        sheet_matrix = client.get_range("A1:P500")
+        sheet_matrix = client.get_range(f"A1:{last_col()}500")
         sheet_rows = matrix_to_rows(sheet_matrix)
+    sheet_rows = dedupe_sheet_rows(sheet_rows, wiki_by_key)
     sheet_by_key = {row["key"]: row for row in sheet_rows}
-    state = load_state(state_path)
+    state = migrate_state(
+        load_state(state_path), wiki_by_key, sheet_by_key
+    )
     last_rows = state.get("rows", {})
 
     wiki_updates: dict[str, dict[str, Any]] = {}
@@ -1081,7 +1315,7 @@ def run_sync(apply: bool, state_path: Path, backend: str = "grist") -> int:
         while len(matrix) < len(current):
             matrix.append(list(current[len(matrix)]))
         if matrix != current:
-            client.update_range(f"A1:P{len(matrix)}", matrix)
+            client.update_range(f"A1:{last_col()}{len(matrix)}", matrix)
             print(f"sheet updated ({len(matrix)} rows)")
         else:
             print("sheet unchanged, skip write")
@@ -1161,7 +1395,7 @@ def command_exchange_code(args: argparse.Namespace) -> int:
 
 def command_sheet_pull(args: argparse.Namespace) -> int:
     client = TencentDocsClient()
-    rows = matrix_to_rows(client.get_range(f"A1:P{args.max_rows}"))
+    rows = matrix_to_rows(client.get_range(f"A1:{last_col()}{args.max_rows}"))
     write_json(Path(args.json), 0, rows)
     write_csv(Path(args.csv), rows)
     print(f"sheet rows={len(rows)}")

@@ -3,7 +3,7 @@ Description=定时触发腾讯文档 → Grist 同步
 
 [Timer]
 OnBootSec=5min
-OnUnitActiveSec=30min
+OnUnitActiveSec=5min
 Unit=tencent-grist-bridge.service
 
 [Install]

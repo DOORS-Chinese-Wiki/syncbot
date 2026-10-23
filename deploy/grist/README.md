@@ -73,11 +73,44 @@ location / {
 
 ## 拿到 API Key
 
-1. 浏览器打开 `APP_HOME_URL`，用 `GRIST_DEFAULT_EMAIL` 注册首个账号
+1. 用管理员分发的邮箱账号打开 `APP_HOME_URL`
 2. 右上角头像 → **Account settings** → **API** → 创建 API key
 3. 记录：
    - `GRIST_API_KEY`
    - `GRIST_DOC_ID`（文档 URL 里的那一段，形如 `https://…/o/doorswiki/<docId>`）
+
+## 账号管理
+
+网页入口由 Nginx Basic Auth 保护，不开放自助注册。账号名可以是邮箱，也可以是
+管理员分发的用户名；Nginx 会将其映射为 Grist 使用的邮箱身份，并通过
+`X-Forwarded-User` 传给 Grist。
+Grist 的登录系统固定为 `forward-auth`，不会回退到默认身份或自助注册。
+
+首次部署时创建管理员账号：
+
+```bash
+install -m 755 deploy/grist/manage-basic-users.sh /usr/local/sbin/grist-user
+/usr/local/sbin/grist-user add admin@example.com
+```
+
+当前服务器的初始管理员邮箱为 `admin@doorsgame.wiki`，首次生成的密码保存在
+`/root/grist-initial-credentials.txt`，文件权限为 `600`。
+
+后续新增、删除和查看账号：
+
+```bash
+/usr/local/sbin/grist-user add editor@example.com
+/usr/local/sbin/grist-user remove editor@example.com
+/usr/local/sbin/grist-user list
+```
+
+账号文件保存在
+`/www/server/nginx/conf/.grist_htpasswd`，所有者固定为 `root:www`，
+权限固定为 `640`。
+
+账号密码只通过交互输入，不接受命令行参数。修改账号文件后脚本会自动执行
+`nginx -t` 并重载 Nginx。`/api/` 不经过 Basic Auth，继续由 Grist API Key
+独立认证，因此机器人同步不受影响。
 
 同步脚本会用官方 `grist-api` 包：
 
@@ -106,3 +139,10 @@ diff、三方状态（`wiki_hash` / `sheet_hash`）、冲突检测、`sheet_dele
    `Module:BadgeData`（170 条）合并，导入 Grist 两张表
 3. 切换两个同步脚本的 client，先在本地干跑比对，再部署
 4. 观察一段时间，确认无差异后再停用腾讯文档同步
+
+## Modifiers 表
+
+`Modifiers` 表由 `scripts/modifiers_sync.py` 单独维护。
+重新导入物品/成就 xlsx 时不要删除这张表，否则修饰符翻译会丢失。
+
+持续同步可使用 `deploy/modifiers-sync.service.example`。

@@ -1,8 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { SpreadsheetFile, Workbook } from "@oai/artifact-tool";
 
-const root = path.resolve("D:/Code/doors-wiki");
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const source = JSON.parse(
   await fs.readFile(path.join(root, "data", "achievements_current.json"), "utf8"),
 );
@@ -17,6 +18,7 @@ const headers = [
   "同步键",
   "分类",
   "成就名",
+  "英文名",
   "描述",
   "达成条件",
   "攻略",
@@ -36,6 +38,7 @@ const rows = source.rows.map((row) => [
   row.key,
   row.category,
   row.title,
+  row.title_en,
   row.text,
   row.directions,
   row.tutorial,
@@ -51,30 +54,30 @@ const rows = source.rows.map((row) => [
   row.sync_status,
 ]);
 
-sheet.getRange(`A1:P${rows.length + 1}`).values = [headers, ...rows];
-const table = sheet.tables.add(`A1:P${rows.length + 1}`, true, "AchievementsTable");
+sheet.getRange(`A1:Q${rows.length + 1}`).values = [headers, ...rows];
+const table = sheet.tables.add(`A1:Q${rows.length + 1}`, true, "AchievementsTable");
 table.style = "TableStyleMedium2";
 table.showBandedRows = true;
 table.showFilterButton = true;
 
 sheet.getRange(`A2:A${rows.length + 1}`).format.fill = "#E9E9E9";
-sheet.getRange(`D2:F${rows.length + 1}`).format.fill = "#FFF6D8";
-sheet.getRange(`P2:P${rows.length + 1}`).format.fill = "#E8F3E5";
-sheet.getRange(`D2:F${rows.length + 1}`).format.wrapText = true;
+sheet.getRange(`E2:G${rows.length + 1}`).format.fill = "#FFF6D8";
+sheet.getRange(`Q2:Q${rows.length + 1}`).format.fill = "#E8F3E5";
+sheet.getRange(`E2:G${rows.length + 1}`).format.wrapText = true;
 sheet.getRange(`G2:G${rows.length + 1}`).format.wrapText = true;
-sheet.getRange(`M2:M${rows.length + 1}`).format.wrapText = true;
+sheet.getRange(`N2:N${rows.length + 1}`).format.wrapText = true;
 
-const widths = [22, 14, 30, 46, 40, 60, 55, 30, 10, 10, 12, 22, 55, 12, 44, 14];
+const widths = [22, 14, 30, 30, 46, 40, 60, 55, 30, 10, 10, 12, 22, 55, 12, 44, 14];
 widths.forEach((width, index) => {
   sheet.getRangeByIndexes(0, index, rows.length + 1, 1).format.columnWidth = width;
 });
-sheet.getRange(`A2:P${rows.length + 1}`).format.rowHeight = 42;
+sheet.getRange(`A2:Q${rows.length + 1}`).format.rowHeight = 42;
 sheet.freezePanes.freezeRows(1);
-sheet.freezePanes.freezeColumns(3);
+sheet.freezePanes.freezeColumns(4);
 sheet.showGridLines = false;
 sheet.tabColor = "#B9935A";
 
-["A", "G", "H", "I", "J", "K", "L", "M", "N", "O"].forEach((column) => {
+["A", "H", "I", "J", "K", "L", "M", "N", "O", "P"].forEach((column) => {
   const columnRange = sheet.getRange(`${column}:${column}`);
   columnRange.hidden = true;
 });

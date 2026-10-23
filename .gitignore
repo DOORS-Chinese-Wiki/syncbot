@@ -21,9 +21,13 @@ data/
 outputs/
 *.xlsx
 *.csv
+*.before
+*.bak
+*.bak-*
 _sync_*/
 _archive_2026-09/
 .tmp_*/
+.tmp_*
 .agent-teams/
 
 # ===== 抓取到的原站内容与译文 =====
@@ -35,6 +39,23 @@ images/
 _policies_dump.txt
 policies_en.txt
 staff_current.txt
+
+# ===== 一次性维护脚本与本地产物 =====
+scripts/_*.py
+scripts/_*/
+scripts/ach_*.py
+scripts/bridge_*.py
+scripts/fix_*.py
+scripts/grist_[0-9]*.py
+scripts/grist_srv_*.py
+scripts/sync6_*.py
+scripts/sync_[0-9]*.py
+scripts/sync_batch*.py
+scripts/sync_en_*.py
+scripts/sync_mini_*.py
+scripts/sync_today_*.py
+scripts/update_*.py
+scripts/verify_*.py
 
 # ===== 本地运行时 =====
 Python/

@@ -17,7 +17,11 @@ SERVER = os.environ.get(
     "GRIST_SERVER", "https://sheet.189-24-78-35.sslip.io"
 )
 DOC_ID = os.environ.get("GRIST_DOC_ID", "1JRoy2vJar2kh945PXUbFP")
-KEY_FIELD = {"ItemNames": "english", "Achievements": "key"}
+KEY_FIELD = {
+    "ItemNames": "english",
+    "Achievements": "key",
+    "Modifiers": "key",
+}
 
 
 def load_key() -> str:

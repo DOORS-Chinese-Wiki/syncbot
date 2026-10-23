@@ -47,6 +47,12 @@ ACH_MAP = {
     "hidden": 10, "obtainable": 11, "badge_id": 12, "old_versions": 13,
     "wiki_rev": 14, "row_hash": 15, "sync_status": 16,
 }
+MODIFIER_MAP = {
+    "key": 1, "category": 2, "title": 3, "description": 4,
+    "description_en": 5, "requirements": 6, "exclusive": 7,
+    "knobs": 8, "rift": 9, "progress": 10, "group": 11,
+    "reason": 12, "wiki_rev": 13, "row_hash": 14, "sync_status": 15,
+}
 
 
 def load_key() -> str:
@@ -195,13 +201,21 @@ def sync_table(grist, table, sheet_rows, key_field, apply_changes):
             continue
         changed = {}
         for field, value in row.items():
-            if field == key_field:
+            if field in {key_field, "wiki_rev", "row_hash", "sync_status"}:
                 continue
             # 腾讯侧为空视为「没填」，不覆盖辅表已有内容，避免误清
             if value == "":
                 if str(current["fields"].get(field, "")) != "":
                     skipped.append((key, field))
                 continue
+            if table == "Modifiers" and field in {"rift", "progress"}:
+                value = (
+                    "true"
+                    if str(value).strip().lower() in {
+                        "是", "true", "1", "yes", "on",
+                    }
+                    else "false"
+                )
             if str(current["fields"].get(field, "")) != str(value):
                 changed[field] = value
         if changed:
@@ -230,7 +244,7 @@ def sync_table(grist, table, sheet_rows, key_field, apply_changes):
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--apply", action="store_true")
-    parser.add_argument("--only", choices=["items", "achievements"])
+    parser.add_argument("--only", choices=["items", "achievements", "modifiers"])
     parser.add_argument(
         "--fill-master", action="store_true",
         help="把 Grist 的「处理状态/优先级」写回腾讯主表的 M、N 两列",
@@ -254,6 +268,22 @@ def main() -> int:
         result["achievements"] = sync_table(
             grist, "Achievements",
             rows_from_matrix(matrix, ACH_MAP, header_row=1),
+            "key", args.apply,
+        )
+    if args.only in (None, "modifiers"):
+        A.load_env(A.ENV_FILE)
+        modifier_file_id = os.environ.get("QQDOCS_MODIFIERS_FILE_ID", "")
+        modifier_sheet_id = os.environ.get("QQDOCS_MODIFIERS_SHEET_ID", "")
+        if not modifier_file_id or not modifier_sheet_id:
+            raise RuntimeError(
+                "缺少 QQDOCS_MODIFIERS_FILE_ID 或 QQDOCS_MODIFIERS_SHEET_ID"
+            )
+        matrix = sheet_matrix(
+            modifier_file_id, modifier_sheet_id, "A1:O200"
+        )
+        result["modifiers"] = sync_table(
+            grist, "Modifiers",
+            rows_from_matrix(matrix, MODIFIER_MAP, header_row=1),
             "key", args.apply,
         )
     STATE.parent.mkdir(parents=True, exist_ok=True)

@@ -6,14 +6,15 @@
 ## 数据流
 
 ```
-腾讯文档（主，社区编辑）
-   │  tencent_grist_bridge.py    每 30 分钟
+腾讯文档（初始录入）
+   │  tencent_grist_bridge.py    每 5 分钟
    ▼
-Grist（辅，自建）      ItemNames 98 / Achievements 170
+Grist（镜像/兜底）     ItemNames 98 / Achievements 170
    │  item_names_sync.py         每 5 分钟
+   │  translation_notes_sync.py  每 5 分钟
    │  achievements_sync.py       每 30 秒
    ▼
-Module:ItemNames / Module:BadgeData（Wiki）
+Module:ItemNames / Module:TranslationNotes / Module:BadgeData（Wiki）
 
 doorsgame.wiki（英文站）
    │  sync_templates.py / tencent_grist_bridge.py
@@ -21,7 +22,8 @@ doorsgame.wiki（英文站）
 Template: / Module: 页面
 ```
 
-- **腾讯文档是主**，Grist 是自建镜像与兜底。腾讯 API 配额出问题时只有第一跳暂停，
+- `Help:翻译说明` 的译名理由以维基模块为最终数据源；外部表格只作镜像和录入界面。
+- 腾讯文档负责初始录入，Grist 是自建镜像与兜底。腾讯 API 配额出问题时只有第一跳暂停，
   Wiki 侧照常同步。
 - 冲突处理用三方状态（`wiki_hash` / `sheet_hash`）：哪边单独变就同步哪边，
   两边都变且不一致就记冲突、两端都不动，交人工处理。
@@ -32,6 +34,8 @@ Template: / Module: 页面
 |---|---|
 | `achievements_sync.py` | 成就文本双向同步（腾讯或 Grist 后端） |
 | `item_names_sync.py` | 物品译名同步，生成 `Module:ItemNames` 与对照表页 |
+| `translation_notes_sync.py` | 同步 `Module:TranslationNotes` 的理由和外部冲突状态 |
+| `modifiers_sync.py` | 同步 `Module:ModifierData` 结构，并从 Grist 回填中文描述 |
 | `tencent_grist_bridge.py` | 腾讯文档 → Grist 单向桥接 |
 | `sync_templates.py` | 从英文站同步 `Template:` / `Module:` 当前修订 |
 | `sync_en_redirects.py` | 同步英文站的重定向 |
@@ -43,7 +47,10 @@ Template: / Module: 页面
 推送清单集中在 `manifests/`（`project.json` / `pages-<日期>.json` / `all.json` /
 `history.json`），用法见 [manifests/README.md](manifests/README.md)。
 
-测试：`python scripts/test_achievements_sync.py`、`test_item_names_sync.py`（离线，不联网）。
+测试：`python scripts/test_achievements_sync.py`、`test_item_names_sync.py`、
+`test_translation_notes_sync.py`（离线，不联网）。
+
+各脚本的维护范围和新增代码约定见 [scripts/README.md](scripts/README.md)。
 
 ## 配置
 
@@ -62,7 +69,7 @@ Template: / Module: 页面
 
 ```bash
 python -m venv .venv
-.venv/bin/pip install pywikibot requests grist-api openpyxl
+.venv/bin/pip install -r requirements.txt
 ```
 
 ## 部署
@@ -71,7 +78,8 @@ python -m venv .venv
 
 - `achievements-sync.service`（常驻，30 秒轮询）
 - `item-names-sync.service` + `.timer`（每 5 分钟）
-- `tencent-grist-bridge.service` + `.timer`（每 30 分钟）
+- `modifiers-sync.service`（常驻，30 秒轮询）
+- `tencent-grist-bridge.service` + `.timer`（每 5 分钟）
 - `grist/`（Grist 自建：docker-compose 与说明）
 
 > 注意：单元模板里**不要写 `User=`**，除非目标机器上确实存在该用户；
