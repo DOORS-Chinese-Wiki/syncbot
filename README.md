@@ -1,93 +1,88 @@
-# DOORS 中文维基 · 同步工具
+# SyncBot
 
-把英文 DOORS Wiki 的模板/模块、以及腾讯文档上的成就文本与物品译名，
-同步到中文维基（`zh.doorsgame.wiki`）。也负责反向回写。
+DOORS 中文维基的同步工具，用于在英文维基、中文维基、腾讯文档和 Grist 之间同步模板、模块、成就、物品译名与修饰符数据。
 
-## 数据流
+这是社区维护项目，与 LSPLASH、Roblox 或 DOORS 官方无隶属关系。
 
-```
-腾讯文档（初始录入）
-   │  tencent_grist_bridge.py    每 5 分钟
-   ▼
-Grist（镜像/兜底）     ItemNames 98 / Achievements 170
-   │  item_names_sync.py         每 5 分钟
-   │  translation_notes_sync.py  每 5 分钟
-   │  achievements_sync.py       每 30 秒
-   ▼
-Module:ItemNames / Module:TranslationNotes / Module:BadgeData（Wiki）
+## 功能
 
-doorsgame.wiki（英文站）
-   │  sync_templates.py / tencent_grist_bridge.py
-   ▼
-Template: / Module: 页面
+- 英文站 `Template:`、`Module:` 和重定向同步到中文站。
+- `Module:BadgeData`、`Module:ItemNames`、`Module:TranslationNotes` 和 `Module:ModifierData` 的双向或单向同步。
+- 腾讯文档到 Grist 的镜像，以及 Grist 到中文维基的回写。
+- 同步前生成计划，默认 dry-run；发生双端冲突时停止自动覆盖。
+
+数据源和同步流程可概括为：
+
+```text
+英文维基  ->  中文维基
+腾讯文档  ->  Grist  <->  中文维基
 ```
 
-- `Help:翻译说明` 的译名理由以维基模块为最终数据源；外部表格只作镜像和录入界面。
-- 腾讯文档负责初始录入，Grist 是自建镜像与兜底。腾讯 API 配额出问题时只有第一跳暂停，
-  Wiki 侧照常同步。
-- 冲突处理用三方状态（`wiki_hash` / `sheet_hash`）：哪边单独变就同步哪边，
-  两边都变且不一致就记冲突、两端都不动，交人工处理。
+## 安装
 
-## 主要脚本
-
-| 脚本 | 作用 |
-|---|---|
-| `achievements_sync.py` | 成就文本双向同步（腾讯或 Grist 后端） |
-| `item_names_sync.py` | 物品译名同步，生成 `Module:ItemNames` 与对照表页 |
-| `translation_notes_sync.py` | 同步 `Module:TranslationNotes` 的理由和外部冲突状态 |
-| `modifiers_sync.py` | 同步 `Module:ModifierData` 结构，并从 Grist 回填中文描述 |
-| `tencent_grist_bridge.py` | 腾讯文档 → Grist 单向桥接 |
-| `sync_templates.py` | 从英文站同步 `Template:` / `Module:` 当前修订 |
-| `sync_en_redirects.py` | 同步英文站的重定向 |
-| `grist_import_exports.py` | 把腾讯导出的 xlsx 导入 Grist |
-| `grist_dedupe.py` | 清理 Grist 里的重复 key |
-| `diff_en_window.py` | 按时间窗比对英文站改动，用于跟进更新 |
-| `sync_project_pages.py` | 同步 `DOORS Wiki:` 项目命名空间页面（英文源 → 中文译文 → 清单 → 推送）；`--redirects` 补旧 `Project:` 重定向，`--messages` 修页脚链接 |
-
-推送清单集中在 `manifests/`（`project.json` / `pages-<日期>.json` / `all.json` /
-`history.json`），用法见 [manifests/README.md](manifests/README.md)。
-
-测试：`python scripts/test_achievements_sync.py`、`test_item_names_sync.py`、
-`test_translation_notes_sync.py`（离线，不联网）。
-
-各脚本的维护范围和新增代码约定见 [scripts/README.md](scripts/README.md)。
-
-## 配置
-
-本项目**不包含任何密钥**，需要自己准备（见 `.gitignore`）：
-
-| 文件 | 内容 |
-|---|---|
-| `user-config.py` | pywikibot 站点与账号配置 |
-| `user-password.py` | pywikibot 密码 |
-| `tencent_docs.env` | 腾讯文档 Client ID/Secret、Access Token、File/Sheet ID |
-| `grist.env` | Grist 的 `GRIST_SERVER` / `GRIST_DOC_ID` / `GRIST_API_KEY` |
-
-模板见 `tencent_docs.env.example`、`deploy/grist/.env.example`。
-
-安装依赖：
+需要 Python 3.10+。
 
 ```bash
+git clone https://github.com/DOORS-Chinese-Wiki/syncbot.git
+cd syncbot
 python -m venv .venv
 .venv/bin/pip install -r requirements.txt
 ```
 
+Windows 下虚拟环境的 Pip 路径为 `.venv\Scripts\pip.exe`。
+
+## 配置
+
+仓库不包含账号或密钥。按需创建以下文件，并确保它们没有被提交：
+
+| 文件 | 用途 |
+|---|---|
+| `user-config.py` | Pywikibot 站点与账号 |
+| `user-password.py` | Pywikibot 密码或 bot password |
+| `tencent_docs.env` | 腾讯文档认证和表格 ID |
+| `grist.env` | Grist 地址、文档 ID 和 API Key |
+
+可从 `tencent_docs.env.example` 和 `deploy/grist/.env.example` 开始配置。
+
+## 常用命令
+
+```bash
+# 检查成就同步计划
+python scripts/achievements_sync.py sync --backend grist
+
+# 物品译名与翻译说明
+python scripts/item_names_sync.py sync --backend grist
+python scripts/translation_notes_sync.py --backend grist
+
+# 修饰符
+python scripts/modifiers_sync.py sync
+
+# 腾讯文档 -> Grist
+python scripts/tencent_grist_bridge.py
+
+# 英文站模板与模块同步；先检查，再加 --apply
+python scripts/sync_templates.py --check-only
+python scripts/sync_templates.py --apply
+```
+
+写操作默认关闭。确认 dry-run 结果后，再为支持 `--apply` 的脚本加上该参数。
+
+完整脚本清单见 [scripts/README.md](scripts/README.md)，推送清单见 [manifests/README.md](manifests/README.md)。
+
+## 测试
+
+```bash
+python scripts/test_achievements_sync.py
+python scripts/test_item_names_sync.py
+python scripts/test_translation_notes_sync.py
+```
+
+这些测试只使用本地样例，不会访问维基、腾讯文档或 Grist。
+
 ## 部署
 
-`deploy/` 下有 systemd 单元模板：
-
-- `achievements-sync.service`（常驻，30 秒轮询）
-- `item-names-sync.service` + `.timer`（每 5 分钟）
-- `modifiers-sync.service`（常驻，30 秒轮询）
-- `tencent-grist-bridge.service` + `.timer`（每 5 分钟）
-- `grist/`（Grist 自建：docker-compose 与说明）
-
-> 注意：单元模板里**不要写 `User=`**，除非目标机器上确实存在该用户；
-> 用户不存在会导致 systemd 报 `217/USER` 并反复重启。
+`deploy/` 提供 systemd、timer 和 Grist Docker 配置的示例。部署前请修改示例中的路径、账号和环境文件。
 
 ## 许可
 
-本仓库采用 **CC BY-SA 4.0**（署名-相同方式共享 4.0 国际），详见 [LICENSE](LICENSE)。
-
-从 DOORS Wiki 同步的模板、模块与文本内容同样遵循 CC BY-SA 4.0，
-版权归原作者与贡献者所有。从游戏文件中提取的资源不在本仓库内。
+代码采用 CC BY-SA 4.0，详见 [LICENSE](LICENSE)。从 DOORS Wiki 同步的文本和模板同样遵循 CC BY-SA 4.0；游戏素材不包含在本仓库中。
